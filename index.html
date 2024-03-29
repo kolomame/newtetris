@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css" />
+        <script src="main.js" charset="utf-8"></script>
+        <title>Tetris</title>
+    </head>
+    <body>
+        <div class="title">
+            <h1>Tetris</h1>
+            <h3>High Score:<span id="highscore">0</span></h3>
+            <h3>Score:<span id="score">0</span></h3>
+            <button id="start-button">Start/Pause</botton>
+            <button id="isGameSoundOn">GameSound on/off</button>
+        </div>
+        <div class="container">
+            <div class="grid">
+                <canvas id="tetrisCanvas" width="200" height="400"></canvas>
+            </div>
+        <div class="sub-grids">
+            <h3>Next<br>Tetrimino</h3>
+            <canvas class="mini-grid" id="miniCanvas" width="100" height="100"></canvas>
+        </div>
+        </div>
+        <div id ="winningMessage" class="winning-message">
+            <div data-winning-message-text></div>
+            <button id = "restartButton">Restart</button>
+        </div>
+        <!-- ゲーム音楽 -->
+        <audio src="sound/retrogamecenter3.mp3" id="gameSound"></audio>
+        <audio src="sound/gameover2_8bit.mp3" id="gameOver"></audio>
+        <audio src="sound/maou_se_system49.mp3" id="clearingALine"></audio>
+    </body>
+</html>
