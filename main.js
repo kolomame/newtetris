@@ -184,7 +184,13 @@ document.addEventListener('DOMContentLoaded', function() {
   
     //回転
     function rotate(position){
-  
+  //[[4,0],[4,1],[5,1],[5,2]]
+  //centerx = 18/4  4.5
+  //centery = 4/4
+  //x = -0.5, -0.5, 0.5, 0.5
+  //y = -1, 0, 0, 1
+  //X = 6, 5, 5, 4
+  //Y = 1, 1, 2, 2
         newPosition = []
         let centerx = 0
         let centery = 0
@@ -194,36 +200,141 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
         for (let j = 0; j < position.length; j++){
-            let x = position[j][0]-(centerx/4)
-            let y = position[j][1]-(centery/4)
-            let X = Math.ceil(x*Math.cos(Math.PI/2) - y*Math.sin(Math.PI/2) + (centerx/4))
-            let Y = Math.ceil(y*Math.cos(Math.PI/2) + x*Math.sin(Math.PI/2) + (centery/4))
+            let x = Math.round(position[j][0]-(centerx/4))
+            let y = Math.round(position[j][1]-(centery/4))
+            let X = Math.round(x*Math.cos(Math.PI/2) - y*Math.sin(Math.PI/2) + (centerx/4))
+            let Y = Math.round(y*Math.cos(Math.PI/2) + x*Math.sin(Math.PI/2) + (centery/4))
             newPosition.push([X,Y])
+        }
+        console.log("変更前position", newPosition)
+        newPosition = revisePositionIfOverflow(newPosition);
+        console.log("変更後position", newPosition)
+        return newPosition
+    }
+
+    function revisePositionIfOverflow(position){
+        //xとyに分ける
+        let listx = []
+        let listy = []
+
+        for (let i = 0; i < position.length; i++){
+            listx.push(position[i][0])
+            listy.push(position[i][1])
+        }
+        console.log("listx", listx)
+        let change_listx = changex(listx)
+        let change_listy = changey(listy)
+        //xとyを繋げる[[x,y], [x2,y2]]
+        let newPosition = []
+        for (let j = 0; j < position.length; j++){
+            newPosition.push([change_listx[j], change_listy[j]])
         }
         return newPosition
     }
-  
-  
-    /* 
-    //全ての関数が描くのに関係している
-  
-    //positionをcopyFieldに反映させる
-    //updatecopyfiledで代用できるかも
-    function startCopyField(copyField, position){
-        for (let i = 0; i < position.length(); i++){
-            let x = position[i][0]
-            let y = position[i][1]
-            copyField[y][x] = 1
+
+    function changex(xlist){
+        let minx = Math.min.apply(null, xlist)
+        let maxx = Math.max.apply(null, xlist)
+
+        if (minx < 0){
+            for (let i = 0; i < xlist.length; i++){
+                xlist[i] += (-minx)
+            }
         }
-        return copyField
+
+        else if (maxx > 9){
+            for (let j = 0; j < xlist.length; j++){
+                xlist[j] -= (maxx - 9)
+            }
+        }
+        return xlist
     }
-    //startdopyfielddrow()
-    //最初のだけ描く
-    function startcopyfileddrow(copyField){
-  
+    function changey(ylist){
+        let miny = Math.min.apply(null, ylist)
+        let maxy = Math.max.apply(null, ylist)
+
+        if (miny < 0){
+            for (let i = 0; i < ylist.length; i++){
+                ylist[i] += (-miny)
+            }
+        }
+
+        else if (maxy > 19){
+            for (let j = 0; j < ylist.length; j++){
+                ylist[j] -= (maxy - 19)
+            }
+        }
+        return ylist
     }
   
-    */
+  
+//   /* テトリミノのx, y座標のはみ出している部分を見つける(あるかどうかも含めて)。
+//      もしあったら、はみ出ている部分を修正する　*/
+//      function revisePositionIfOverflow(position) {
+//         /* x座標のはみ出している部分を見つける(あるかどうかも含めて)。もしあったら、はみ出ている部分を修正する */
+//          function revisePositionOfX(position) {
+//           let maxOutX = -1 
+//           let minOutX = 1
+//           for (let i = 0; i < position.length; i++) {
+//               // もし＋にはみ出ているx座標があったら、maxを計算
+//               if (position[i][0] > 9) {
+//                 maxOutX = Math.max(maxOutX, position[i][0]);
+//               }
+//               // もし-にはみ出ているx座標があったら、minを計算
+//               if (position[i][0] < 0) {
+//                 minOutX = Math.min(minOutX, position[i][0]);
+//               }
+//           }
+//           // はみ出している部分があるかどうか確かめ、あれば修正(なければそのまま元のpositionを返す)
+//           let newPosition = []
+//           if (maxOutX != -1) {
+//             for(let i = 0; i < position.length; i++) {
+//               newPosition.push([position[i][0] - (maxOutX-9), position[i][1]]);
+//             }
+//           }
+//           else if (minOutX != 1) {
+//             for(let i = 0; i < position.length; i++) {
+//               newPosition.push([position[i][0] - minOutX, position[i][1]]);
+//             }
+//           } else {
+//             return position
+//           }
+//           return newPosition
+//         }
+//         /* y座標のはみ出している部分を見つける(あるかどうかも含めて)。もしあったら、はみ出ている部分を修正する*/ 
+//         function revisePositionOfY(position) {
+//           let maxOutY = -1
+//           let minOutY = 1
+//           for (let i = 0; i < position.length; i++) {
+//               // もし＋にはみ出ているy座標があったら、maxを計算
+//               if (position[i][1] > 19) {
+//                 maxOutY = Math.max(maxOutY, position[i][1]);
+//               }
+//               // もし-にはみ出ているy座標があったら、minを計算
+//               if (position[i][1] < 0) {
+//                 minOutY = Math.min(minOutY, position[i][1]);
+//               }
+//           }
+//           // はみ出している部分があるかどうか確かめ、あれば修正(なければそのまま元のpositionを返す)
+//           let newPosition = []
+//           if (maxOutY != -1) {
+//             for(let i = 0; i < position.length; i++) {
+//               newPosition.push([position[i][0], position[i][1] - (maxOutY-19)]);
+//             }
+//           }
+//           else if (minOutY != 1) {
+//             for(let i = 0; i < position.length; i++) {
+//               newPosition.push([position[i][0], position[i][1] - minOutY]);
+//             }
+//           } else {
+//             return position
+//           }
+//           return newPosition
+//         }
+//         let revesedPosition = revisePositionOfY(revisePositionOfX(position));
+//         return revesedPosition
+//       }
+  
   
     //消して描いて消して描いてを考える
     //最初の描く部分は考えていない
@@ -428,7 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
   
             position = hashmap[event.key]();
-            console.log('key操作field: ', field)
+            console.log('key操作position: ', position)
             console.log('key操作copyfield: ',copyField)
             alldrow(copyField, position,randomNumber, field)
             for(let i = 0; i < position.length; i++){
@@ -492,17 +603,17 @@ document.addEventListener('DOMContentLoaded', function() {
   
     //loop生み出す関数
     function createloop(){
-        let loop = setTimeout(autodown, speed)
-        return loop
+        loop = setTimeout(autodown, speed)
+        
     }
     //loop削除関数
-    function deletloop(loop){
+    function deletloop(){
         clearTimeout(loop,speed);
     }
     
     function autodown() {
         if (!isPaused){
-            createloop()
+
   
             position = under(field, position,copyField);
             alldrow(copyField, position,randomNumber, field)        
@@ -529,7 +640,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     position = mainTetrimino(randomNumber, copyField, point, field)
                     if (position == 'gameover'){
                         // ゲームオーバーの処理
-                        deletloop(createloop())
+                        deletloop()
                         playerpoint = score(point - 10);
                         winningMessageTextElement.innerText = `Score: ${playerpoint}`;
                         winningMessageElement.classList.add('show');
@@ -541,6 +652,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
             }
+            createloop()
   
         }
   
@@ -560,10 +672,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
     startButton.addEventListener('click', function() {
       if (!isPaused) {
-        deletloop(createloop());
+        deletloop();
         startButton.innerText = 'Restart';
       } else {
-        autodown();
+        createloop();
         startButton.innerText = 'Pause';
       }
       isPaused = !isPaused;
@@ -576,8 +688,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
         
         mainTetrimino(randomNumber, copyField, point, field);//最初のテトリミノ
-  
-        console.log(position)
         autodown()
   
     }
