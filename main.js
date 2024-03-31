@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
         else{
 
             alldrow(copyField, position, randomnum, field)
-            speed -= 10
+            speed -= 30
             console.log("speed", speed)
   
             return position
