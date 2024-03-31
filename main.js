@@ -31,7 +31,18 @@ document.addEventListener('DOMContentLoaded', function() {
             [[0,1,1,0],
             [0,1,0,0],
             [0,1,0,0],
-            [0,0,0,0]]]
+            [0,0,0,0]],
+  
+            [[0,1,1,0],
+            [0,0,1,0],
+            [0,0,1,0],
+            [0,0,0,0]],
+  
+            [[0,0,1,0],
+            [0,1,1,0],
+            [0,1,0,0],
+            [0,0,0,0]]
+        ]
             //[1, 3],   [1, 2],  [1, 1],   [2, 1]   回転前
             //x:-1,y:-2 x:0,y:-1 x:+1,y:0  x:0,y:+1
             //[[0, 1],  [1, 1],  [2, 1],   [2, 2]]　回転前の座標が回転することによりどこに移ったか（xとyの変化量をそれぞれ記憶する）
@@ -46,7 +57,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const purple = '#800080'
     const blue = '#0000ff'
     const black = '#000000'
-    const color = [green, red, purple, blue, yellow, black] 
+    const orange = '#FFA500'
+    const lightBlue = '#ADD8E6'
+    const excolor = '#999999'
+    const color = [green, red, purple, blue, yellow, orange, lightBlue, excolor] 
   
   
   
@@ -131,8 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
     //下に落ちる
     function under(field, position, copyField){
-        console.log('field: ',field)
-        console.log('position: ', position)
+
   
         //position更新
         newPosition = []
@@ -140,13 +153,11 @@ document.addEventListener('DOMContentLoaded', function() {
             copyField[position[j][1]][position[j][0]] = 1
             newPosition.push([position[j][0],position[j][1]+1])
         }
-        console.log('newposition', newPosition)
+
         return newPosition
     }
     //右に移動
     function right(position){
-        // console.log(field)
-        // console.log(copyField)
         for (let i = 0; i < position.length; i++){
             let x = position[i][0]
             let y = position[i][1]
@@ -363,7 +374,13 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let x = 0; x < copyField[0].length; x++){
                 if (copyField[y][x] >= 2){//2以上にするとテトリミノの種類に応じて色変更ができるかも．hashmapを用いれば
                     draw(x, y, color[copyField[y][x]-2])
-                    if (copyField[y][x] == 7){
+
+
+
+
+                    //影の部分は塗った後に0にする
+                    //もしテトリミノも同じようにしてしまうと着地したテトリミノの色が塗れない
+                    if (copyField[y][x] == color.length + 1){
                         copyField[y][x] = 0
                     }
   
@@ -381,6 +398,10 @@ document.addEventListener('DOMContentLoaded', function() {
         context.fillStyle = color
         const cellSize = 20;
         context.fillRect(x*cellSize, y*cellSize, cellSize, cellSize)
+
+        context.strokeStyle = 'black'; // 枠線の色
+        context.lineWidth = 0.2; // 枠線の太さ
+        context.strokeRect(x*cellSize, y*cellSize, cellSize, cellSize);
     }
   
   //描く関数をまとめてみる
@@ -418,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
         for (let i = 0; i < exposition.length; i++){
             let x = exposition[i][0]
             let y = exposition[i][1]
-            copyField[y][x] = 7
+            copyField[y][x] = color.length + 1
         }
     }
   
@@ -442,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const miniContext = miniCanvas.getContext('2d');
     /* 0~4のランダムな整数を取得して、
      ランダムなテトリミノを１つ取得 */
-    let randomNumber = Math.floor(Math.random() * 5);
+    let randomNumber = Math.floor(Math.random() * 7);
      
   
   
@@ -464,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 次のテトリミノの呼び出し
   
     function nextTetrimino(){
-        miniContext.fillStyle = '#CCCCCC'; // グレー色
+        miniContext.fillStyle = gray; // グレー色
         miniContext.fillRect(0, 0, miniCanvas.width, miniCanvas.height);
   
     
@@ -476,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
         nextPosition = miniGetxy(nextTetriminoPattern);
         
         // miniCanvasに描画
-        const cellSize = 20
+        const cellSize = height
         for (let i = 0; i < nextPosition.length; i++) {
         let x = nextPosition[i][0]
         let y = nextPosition[i][1]
@@ -502,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('position: ', position)
         if (gameover(position,field)){
               // ゲームオーバーの処理
-              deletloop(createloop())
+              deletloop()
               playerpoint = score(point - 10);
               winningMessageTextElement.innerText = `Score: ${playerpoint}`;
               winningMessageElement.classList.add('show');
@@ -531,16 +552,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // code プロパティを使うと大文字/小文字が区別されます。
         // 何かキーボードの押して、コンソールに出力されているか確かめましょう。
         if (hashmap[event.key]) {
+            //塗る前に今のpositionを過去のpositionに変更しておく
             for (let i = 0; i < position.length; i++){
                 let x = position[i][0]
                 let y = position[i][1]
                 copyField[y][x] = 1
-  
             }
-  
+            //positionの更新
             position = hashmap[event.key]();
-            console.log('key操作position: ', position)
-            console.log('key操作copyfield: ',copyField)
             alldrow(copyField, position,randomNumber, field)
             for(let i = 0; i < position.length; i++){
                 //下にブロックがあったら
@@ -647,19 +666,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         restartButton.addEventListener('click', function(){location.reload()});
                         return;
                     }
-                    
-                    
                 }
-                
             }
             createloop()
-  
         }
-  
-  
-  
-  
-        
     }
   
     const winningMessageElement = document.getElementById('winningMessage');
