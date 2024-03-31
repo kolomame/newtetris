@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     //HTMLのスコア表示のため↓
     const scoreDisplay = document.querySelector('#score')
   
-    const speed = 5000;
+    speed = 3000;
     var point = 0;
     function tetrimino(num){
   
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 field[i].fill(0)
                 //scoreを保存する
                 point = score(point)
-                console.log(point)
+
                 //消えた分下に下がる
                 down(i, field)
                 // console.log(field)
@@ -217,9 +217,10 @@ document.addEventListener('DOMContentLoaded', function() {
             let Y = Math.round(y*Math.cos(Math.PI/2) + x*Math.sin(Math.PI/2) + (centery/4))
             newPosition.push([X,Y])
         }
-        console.log("変更前position", newPosition)
+
         newPosition = revisePositionIfOverflow(newPosition);
-        console.log("変更後position", newPosition)
+
+
         return newPosition
     }
 
@@ -232,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
             listx.push(position[i][0])
             listy.push(position[i][1])
         }
-        console.log("listx", listx)
+
         let change_listx = changex(listx)
         let change_listy = changey(listy)
         //xとyを繋げる[[x,y], [x2,y2]]
@@ -246,6 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function changex(xlist){
         let minx = Math.min.apply(null, xlist)
         let maxx = Math.max.apply(null, xlist)
+
 
         if (minx < 0){
             for (let i = 0; i < xlist.length; i++){
@@ -264,6 +266,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let miny = Math.min.apply(null, ylist)
         let maxy = Math.max.apply(null, ylist)
 
+
+
         if (miny < 0){
             for (let i = 0; i < ylist.length; i++){
                 ylist[i] += (-miny)
@@ -277,6 +281,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return ylist
     }
+
+    // //回転したときにブロックに重なるのを防ぐ関数
+    // //回転しその後位置を修正した後にそのpositionにブロックがあるかどうか(true false)
+    // //judgeをfor文でまわす
+    // //false 回転できない
+
+    // function check(field, position){
+    //     for (let i = 0; i < position.length; i++){
+    //         let x = position[i][0]
+    //         let y = position[i][1]
+    //         //ブロックがあれば
+    //         if (field[y][x] != 0){
+    //             return false
+    //         }
+    //     }
+    //     return true
+    // }
   
   
 //   /* テトリミノのx, y座標のはみ出している部分を見つける(あるかどうかも含めて)。
@@ -464,6 +485,8 @@ document.addEventListener('DOMContentLoaded', function() {
     /* 0~4のランダムな整数を取得して、
      ランダムなテトリミノを１つ取得 */
     let randomNumber = Math.floor(Math.random() * 7);
+
+
      
   
   
@@ -490,7 +513,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
     
         // 次のテトリミノの呼び出し
-        let nextRandomNumber = Math.floor(Math.random() * 5);
+        let nextRandomNumber = Math.floor(Math.random() * 7);
+
+
         let nextTetriminoPattern = tetrimino(nextRandomNumber);
         // テトリミノのminiCanvas内での位置を取得
         let nextPosition;
@@ -517,10 +542,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
   
         let tetriminoPattern = tetrimino(randomnum);
-        console.log('randomtetorimino', randomnum)
+
   
         position = getxy(tetriminoPattern);
-        console.log('position: ', position)
+
         if (gameover(position,field)){
               // ゲームオーバーの処理
               deletloop()
@@ -528,11 +553,13 @@ document.addEventListener('DOMContentLoaded', function() {
               winningMessageTextElement.innerText = `Score: ${playerpoint}`;
               winningMessageElement.classList.add('show');
               restartButton.addEventListener('click', function(){location.reload()});
-              return 'gameover'
+              return 
         }
         else{
-            console.log('maintetalldrow')
+
             alldrow(copyField, position, randomnum, field)
+            speed -= 10
+            console.log("speed", speed)
   
             return position
         }
@@ -565,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 //下にブロックがあったら
                 //着地
                 if (underjudge(field, [[position[i][0],position[i][1]]])){
-                    console.log('着地')
+
                     for (let i = 0; i < position.length; i++){
                         let x = position[i][0]
                         let y = position[i][1]
@@ -582,15 +609,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     next = nextlist[0]
                     nextRandomNumber = nextlist[1]
                     position = mainTetrimino(randomNumber, copyField, point, field)
-                    if (position == 'gameover'){
-                        // ゲームオーバーの処理
-                        deletloop(createloop())
-                        playerpoint = score(point - 10);
-                        winningMessageTextElement.innerText = `Score: ${playerpoint}`;
-                        winningMessageElement.classList.add('show');
-                        restartButton.addEventListener('click', function(){location.reload()});
-                        return;
-                  }
+                //     if (position == 'gameover'){
+                //         // ゲームオーバーの処理
+                //         deletloop()
+                //         playerpoint = score(point - 10);
+                //         winningMessageTextElement.innerText = `Score: ${playerpoint}`;
+                //         winningMessageElement.classList.add('show');
+                //         restartButton.addEventListener('click', function(){location.reload()});
+                //         return;
+                //   }
   
                     
                 }
@@ -632,15 +659,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function autodown() {
         if (!isPaused){
-
-  
             position = under(field, position,copyField);
             alldrow(copyField, position,randomNumber, field)        
             for(let i = 0; i < position.length; i++){
                 //下にブロックがあったら
                 //着地
                 if (underjudge(field, [[position[i][0],position[i][1]]])){
-                    console.log('着地')
+
                     for (let i = 0; i < position.length; i++){
                         let x = position[i][0]
                         let y = position[i][1]
@@ -657,15 +682,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     next = nextlist[0]
                     nextRandomNumber = nextlist[1]
                     position = mainTetrimino(randomNumber, copyField, point, field)
-                    if (position == 'gameover'){
-                        // ゲームオーバーの処理
-                        deletloop()
-                        playerpoint = score(point - 10);
-                        winningMessageTextElement.innerText = `Score: ${playerpoint}`;
-                        winningMessageElement.classList.add('show');
-                        restartButton.addEventListener('click', function(){location.reload()});
-                        return;
-                    }
+                    // if (position == 'gameover'){
+                    //     // ゲームオーバーの処理
+                    //     deletloop()
+                    //     playerpoint = score(point - 10);
+                    //     winningMessageTextElement.innerText = `Score: ${playerpoint}`;
+                    //     winningMessageElement.classList.add('show');
+                    //     restartButton.addEventListener('click', function(){location.reload()});
+                    //     return;
+                    // }
                 }
             }
             createloop()
