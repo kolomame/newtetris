@@ -388,8 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
         //固定のブロックは2にしておく
         //描くときについでに1は0にできるかも
     function copyfielddrow(copyField){
-        const red = '#ff0000'
-        const grey = '#CCCCCC' 
+
   
         for (let y = 0; y < copyField.length; y++){
             for (let x = 0; x < copyField[0].length; x++){
@@ -408,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 else if(copyField[y][x] <= 1){
                     copyField[y][x] = 0
-                    draw(x, y, grey)
+                    draw(x, y, gray)
                 }
             }
         }
@@ -420,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const cellSize = 20;
         context.fillRect(x*cellSize, y*cellSize, cellSize, cellSize)
 
-        context.strokeStyle = 'black'; // 枠線の色
+        context.strokeStyle = black; // 枠線の色
         context.lineWidth = 0.2; // 枠線の太さ
         context.strokeRect(x*cellSize, y*cellSize, cellSize, cellSize);
     }
@@ -660,12 +659,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function autodown() {
         if (!isPaused){
             position = under(field, position,copyField);
-            alldrow(copyField, position,randomNumber, field)        
+            alldrow(copyField, position,randomNumber, field)
             for(let i = 0; i < position.length; i++){
                 //下にブロックがあったら
                 //着地
                 if (underjudge(field, [[position[i][0],position[i][1]]])){
-
                     for (let i = 0; i < position.length; i++){
                         let x = position[i][0]
                         let y = position[i][1]
